@@ -32,27 +32,25 @@ const appRoutes: Routes = [
   },
   {
     path: AppRoutes.signin,
-    // canActivate: [AuthGuardService],
     component: SigninComponent,
   },
   {
     path: AppRoutes.signup,
-    // canActivate: [AuthGuardService],
     component: SignupComponent,
   },
   {
     path: `${AppRoutes.books}`,
-    // canActivate: [AuthGuardService],
+    canActivate: [AuthGuardService],
     component: BooksListComponent,
   },
   {
     path: `${AppRoutes.books}/:id`,
-    // canActivate: [AuthGuardService],
+    canActivate: [AuthGuardService],
     component: BookItemComponent,
   },
   {
     path: `${AppRoutes.newBook}`,
-    // canActivate: [AuthGuardService],
+    canActivate: [AuthGuardService],
     component: BookFormComponent,
   },
   { path: AppRoutes.fourOhFour, component: FourOhFourComponent },
