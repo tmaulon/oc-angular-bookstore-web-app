@@ -9,7 +9,6 @@ import {
 import { getApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { Observable } from 'rxjs';
-import { AppRoutes } from './../../app.module';
 
 @Injectable({
   providedIn: 'root',
@@ -30,7 +29,7 @@ export class AuthGuardService implements CanActivate {
         if (user) {
           resolve(true);
         } else {
-          this.router.navigate([`/${AppRoutes.signin}`]);
+          this.router.navigate([`/auth`, 'signin']);
           reject(false);
         }
       });

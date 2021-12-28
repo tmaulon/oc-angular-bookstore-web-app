@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AppRoutes } from 'src/app/app.module';
 import { AuthService } from 'src/app/services/auth/auth.service';
 
 @Component({
@@ -39,7 +38,7 @@ export class SigninComponent implements OnInit {
     try {
       const user = await this.authService.signInUser(email, password);
       if (user) {
-        this.router.navigate([`/${AppRoutes.books}`]);
+        this.router.navigate([`/books`]);
       }
     } catch (error) {
       this.errorMessage = error as string;

@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AppRoutes } from 'src/app/app.module';
 import { AuthService } from './../../../services/auth/auth.service';
 
 @Component({
@@ -50,7 +49,7 @@ export class SignupComponent implements OnInit {
     try {
       const newUser = await this.authService.createNewUser(email, password);
       if (newUser) {
-        this.router.navigate([`/${AppRoutes.books}`]);
+        this.router.navigate([`/books`]);
       }
     } catch (error) {
       this.errorMessage = error as string;

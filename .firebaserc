@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "oc-angular-bookstore-web-app": {
+      "hosting": {
+        "oc-bookstore-web-app": [
+          "oc-angular-bookstore-web-app"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "oc-angular-bookstore-web-app"
+  }
+}
