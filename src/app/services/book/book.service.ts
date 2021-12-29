@@ -6,6 +6,13 @@ import {
   ref,
   set,
 } from 'firebase/database';
+import {
+  deleteObject,
+  getDownloadURL,
+  getStorage,
+  ref as storageRef,
+  uploadBytesResumable,
+} from 'firebase/storage';
 import { Subject } from 'rxjs';
 import { Book } from './../../models/book/book.model';
 
@@ -15,23 +22,9 @@ import { Book } from './../../models/book/book.model';
 export class BookService {
   books: Book[] = [];
   booksSubject = new Subject<Book[]>();
-  // booksItemsRefs: AngularFireList<Book> | undefined;
-  // booksItems: Observable<Book[]>;
 
   constructor() {
     this.getBooks();
-    // this.booksItemsRefs = this.db.list('books');
-    // this.booksItems = this.booksItemsRefs.snapshotChanges().pipe(
-    //   map((changes) =>
-    //     changes.map((item) => {
-    //       console.log('item : ', item);
-    //       return {
-    //         key: item.payload.key as string,
-    //         ...(item.payload.val() as Book),
-    //       };
-    //     })
-    //   )
-    // );
   }
 
   emitBooks() {
@@ -46,7 +39,7 @@ export class BookService {
     const db = getDatabase();
     const booksRef = ref(db, '/books');
     onValue(booksRef, (data: DataSnapshot) => {
-      console.log('in getBooks, data : ', data);
+      console.log('in getBooks, data, data.val() : ', data, data.val());
       this.books = data.val() ? data.val() : [];
       this.emitBooks();
     });
@@ -75,12 +68,81 @@ export class BookService {
     this.emitBooks();
   }
   removeBook(book: Book) {
+    if (book.picture) {
+      const storage = getStorage();
+      const pictureStorageRef = storageRef(storage, book.picture);
+      deleteObject(pictureStorageRef).then(
+        () => console.log('Photo supprimée !'),
+        (error) =>
+          console.error(
+            "Une erreur est survenue lors de la suppression de l'image... Erreur : ",
+            error
+          )
+      );
+    }
     const bookIndexToRemove = this.books.findIndex(
       (bookItem) => bookItem === book
     );
     this.books.splice(bookIndexToRemove, 1);
     this.saveBooks();
     this.emitBooks();
+  }
+  /**
+   * Firebase Documentation
+   * @url : https://firebase.google.com/docs/storage/web/upload-files
+   * @param file
+   */
+  uploadFile(file: File) {
+    return new Promise((resolve, reject) => {
+      const almostUniqueFileName = Date.now().toString();
+      const storage = getStorage();
+      const pictureStorageRef = storageRef(
+        storage,
+        'images/' + almostUniqueFileName + file.name
+      );
+
+      // Upload the file and metadata
+      const uploadTask = uploadBytesResumable(pictureStorageRef, file);
+
+      // Register three observers:
+      // 1. 'state_changed' observer, called any time the state changes
+      // 2. Error observer, called on failure
+      // 3. Completion observer, called on successful completion
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          // Observe state change events such as progress, pause, and resume
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log(
+            'Le chargement est ' + progress + '% terminé...',
+            snapshot
+          );
+          switch (snapshot.state) {
+            case 'paused':
+              console.log('Les chargement est arrété !');
+              break;
+            case 'running':
+              console.log('Le chargement est en cours...');
+              break;
+          }
+        },
+        (error) => {
+          // Handle unsuccessful uploads
+          console.error('Le chargement a échoué ! Erreur : ', error);
+          reject(error);
+        },
+        () => {
+          // Handle successful uploads on complete
+          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            console.log("Le fichier est disponible à l'url : ", downloadURL);
+            resolve(downloadURL);
+          });
+        }
+      );
+    });
   }
 
   /**
@@ -111,41 +173,6 @@ export class BookService {
         onlyOnce: true,
       }
     );
-  }
-
-  async getBook(id: number) {
-    const db = getDatabase();
-    const bookRef = query(ref(db, `/books/${id}`));
-    onValue(
-      bookRef,
-      (snapshot) => {
-        console.log('in get book, snapshot : ', snapshot);
-        return snapshot.val();
-      },
-      {
-        onlyOnce: true,
-      }
-    );
-  }
-
-  addBook(newBook: Book) {
-    this.booksItemsRefs?.push(newBook);
-  }
-
-  updateBook(key: string, updatedBook: Book) {
-    this.booksItemsRefs?.update(key, updatedBook);
-  }
-
-  deleteBook(key: string) {
-    this.booksItemsRefs?.remove(key);
-  }
-
-  deleteAllBooks() {
-    this.booksItemsRefs?.remove();
-  }
-
-  saveAllBooks() {
-    this.books.map((book) => this.booksItemsRefs?.push(book));
   }
   */
 }

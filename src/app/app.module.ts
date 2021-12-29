@@ -1,17 +1,8 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { getAuth, provideAuth } from '@angular/fire/auth';
-import { getDatabase, provideDatabase } from '@angular/fire/database';
-import { getFunctions, provideFunctions } from '@angular/fire/functions';
-import {
-  getRemoteConfig,
-  provideRemoteConfig,
-} from '@angular/fire/remote-config';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule, Routes } from '@angular/router';
-import { environment } from '../environments/environment';
 import { AppComponent } from './app.component';
 import { SigninComponent } from './components/auth/signin/signin.component';
 import { SignupComponent } from './components/auth/signup/signup.component';
@@ -65,11 +56,6 @@ const appRoutes: Routes = [
     ReactiveFormsModule,
     HttpClientModule,
     RouterModule.forRoot(appRoutes),
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideAuth(() => getAuth()),
-    provideDatabase(() => getDatabase()),
-    provideFunctions(() => getFunctions()),
-    provideRemoteConfig(() => getRemoteConfig()),
   ],
   providers: [AuthService, AuthGuardService, BookService],
   bootstrap: [AppComponent],
