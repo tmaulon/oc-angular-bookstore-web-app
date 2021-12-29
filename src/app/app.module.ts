@@ -16,45 +16,26 @@ import { AuthGuardService } from './services/auth-guard/auth-guard.service';
 import { AuthService } from './services/auth/auth.service';
 import { BookService } from './services/book/book.service';
 
-export enum AppRoutes {
-  home = '',
-  signin = 'auth/signin',
-  signup = 'auth/signup',
-  books = 'livres',
-  newBook = 'nouveau-livre',
-  fourOhFour = 'not-found',
-}
-
 const appRoutes: Routes = [
+  { path: 'auth/signup', component: SignupComponent },
+  { path: 'auth/signin', component: SigninComponent },
   {
-    path: AppRoutes.home,
-    component: WelcomeComponent,
-  },
-  {
-    path: AppRoutes.signin,
-    component: SigninComponent,
-  },
-  {
-    path: AppRoutes.signup,
-    component: SignupComponent,
-  },
-  {
-    path: `${AppRoutes.books}`,
+    path: 'books',
     canActivate: [AuthGuardService],
     component: BooksListComponent,
   },
   {
-    path: `${AppRoutes.books}/:id`,
-    canActivate: [AuthGuardService],
-    component: BookItemComponent,
-  },
-  {
-    path: `${AppRoutes.newBook}`,
+    path: 'books/new',
     canActivate: [AuthGuardService],
     component: BookFormComponent,
   },
-  { path: AppRoutes.fourOhFour, component: FourOhFourComponent },
-  { path: '**', redirectTo: AppRoutes.fourOhFour },
+  {
+    path: 'books/view/:id',
+    canActivate: [AuthGuardService],
+    component: BookItemComponent,
+  },
+  { path: '', redirectTo: 'books', pathMatch: 'full' },
+  { path: '**', redirectTo: 'books' },
 ];
 
 @NgModule({
